@@ -27,10 +27,10 @@ int main() {
 
 		cout << "Please input the infix expression with spaces between each token. Or, you could type \"quit\" to quit."
 				<< endl << "Input: ";
-		cin.get(input, 100);
+	        cin.get(input, 100);
 		cin.ignore();
 		cout << quit << " " << input;
-		if (strcasecmp(quit, input) == 0) {
+		if (strncasecmp(quit, input, strlen(quit)) == 0) {
 			isRunning = false;
 		}
 		else {
