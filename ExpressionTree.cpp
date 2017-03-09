@@ -80,6 +80,8 @@ int main() {
 				//If it's a right paren, pop everything between it and the corresponding left paren.
 				else if (input[i] == ')') {
 					while (peek(head)->getData() != '(') {
+						if (output[counter - 1] != ' ')
+							output[counter++] = ' ';
 						output[counter] = pop(head)->getData();
 						counter++;
 					}
