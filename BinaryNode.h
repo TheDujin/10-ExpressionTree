@@ -1,15 +1,16 @@
 /*
- * Node.h
+ * BinaryNode.h
  *
- *  Created on: March 7, 2017
- *      Author: Kevin Jin
+ *  Created on: Mar 9, 2017
+ *      Author: 293359
  */
 
-#ifndef NODE_H_
-#define NODE_H_
+#ifndef BINARYNODE_H_
+#define BINARYNODE_H_
 
 #include <iostream>
 using namespace std;
+//TODO Edit the comment below
 /** -- Class Node --
   * The Node object is a component that, in conjunction with other nodes,
   * can form singly-linked lists.
@@ -41,19 +42,24 @@ using namespace std;
   *    caused by deleting the Node.
   *
   **/
-class Node {
+class BinaryNode {
  public:
-  Node(char* newData);
-  Node* getNext();
+  BinaryNode(char* newData, BinaryNode* newParent);
+  BinaryNode* getLeft();
+  BinaryNode* getRight();
+  BinaryNode* getParent();
   char* getData();
-  void setNext(Node* newNext);
-  ~Node();
+  void setLeft(BinaryNode* newLeft);
+  void setRight(BinaryNode* newRight);
+  ~BinaryNode();
 
  private:
   char* data;
-  Node* next;
+  BinaryNode* left;
+  BinaryNode* right;
+  BinaryNode* parent;
 };
 
 
 
-#endif /* NODE_H_ */
+#endif /* BINARYNODE_H_ */

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "Node.h"
+#include "BinaryNode.h"
 #include <string.h>
 using namespace std;
 
@@ -15,6 +16,7 @@ using namespace std;
 void push(Node* newNode, Node* & bottom);
 Node* pop(Node* & bottom);
 Node* peek(Node* & bottom);
+void createTree (BinaryNode* & root, Node* & tempStack);
 
 //Main method. Prompts for the infix expression, then converts it.
 int main() {
@@ -29,7 +31,6 @@ int main() {
 				<< endl << "Input: ";
 	        cin.get(input, 100);
 		cin.ignore();
-		cout << quit << " " << input;
 		if (strncasecmp(quit, input, strlen(quit)) == 0) {
 			isRunning = false;
 		}
@@ -47,42 +48,48 @@ int main() {
 				}
 				//If it's AS, pop out of the stack all operators with more precedence (including other AS) then push it onto the stack.
 				else if (input[i] == '+' || input[i] == '-') {
-					while (peek(head) != NULL && (peek(head)->getData() == '^' || peek(head)->getData() == '*' || peek(head)->getData() == '/'
-							|| peek(head)->getData() == '+' || peek(head)->getData() == '-')) {
+					while (peek(head) != NULL && (peek(head)->getData()[0] == '^' || peek(head)->getData()[0] == '*' || peek(head)->getData()[0] == '/'
+							|| peek(head)->getData()[0] == '+' || peek(head)->getData()[0] == '-')) {
 									if (output[counter - 1] != ' ')
 										output[counter++] = ' ';
-									output[counter] = pop(head)->getData();
+									output[counter] = pop(head)->getData()[0];
 									counter++;
 								}
-								push(new Node(input[i]), head);
+								char* temp = new char[1];
+								temp[0] = input[i];
+								push(new Node(temp), head);
 								output[counter++] = ' ';
 				}
 				//If it's DM, ditto AS.
 				else if (input[i] == '*' || input[i] == '/') {
-					while (peek(head) != NULL && (peek(head)->getData() == '^' || peek(head)->getData() == '*' || peek(head)->getData() == '/')) {
+					while (peek(head) != NULL && (peek(head)->getData()[0] == '^' || peek(head)->getData()[0] == '*' || peek(head)->getData()[0] == '/')) {
 						if (output[counter - 1] != ' ')
 							output[counter++] = ' ';
-						output[counter] = pop(head)->getData();
+						output[counter] = pop(head)->getData()[0];
 						counter++;
 					}
-					push(new Node(input[i]), head);
+					char* temp = new char[1];
+					temp[0] = input[i];
+					push(new Node(temp), head);
 					output[counter++] = ' ';
 				}
 				//If it's E, push it on (it will always have higher precedence than any other operators on the stack).
 				else if (input[i] == '^') {
-					push(new Node('^'), head);
+					char* temp = "^";
+					push(new Node(temp), head);
 					output[counter++] = ' ';
 				}
 				//If it's a left paren, push it.
 				else if (input[i] == '(') {
-					push(new Node('('), head);
+					char* temp = "(";
+					push(new Node(temp), head);
 				}
 				//If it's a right paren, pop everything between it and the corresponding left paren.
 				else if (input[i] == ')') {
-					while (peek(head)->getData() != '(') {
+					while (peek(head)->getData()[0] != '(') {
 						if (output[counter - 1] != ' ')
 							output[counter++] = ' ';
-						output[counter] = pop(head)->getData();
+						output[counter] = pop(head)->getData()[0];
 						counter++;
 					}
 					pop(head);
@@ -100,10 +107,51 @@ int main() {
 			if (!invalid) {
 				while (peek(head) != NULL) {
 					output[counter++] = ' ';
-					output[counter] = pop(head)->getData();
+					output[counter] = pop(head)->getData()[0];
 					counter++;
 				}
 				cout << "The postfix expression created from your input: " << output << endl;
+				bool loopThis = true;
+				BinaryNode* root = NULL;
+				Node* tempStack = NULL;
+				char* temp = new char[80];
+				int counter = 0;
+				for (int i = 0; i < strlen(output); i++) {
+					if (output[i] != ' ') {
+						temp[counter] = output[i];
+						counter++;
+					}
+					else {
+						temp[counter] = '\0';
+						push(new Node(temp), tempStack);
+						counter = 0;
+						temp = new char[80];
+					}
+				}
+				createTree(root, tempStack);
+				temp[counter] = '\0';
+				push(new Node(temp), tempStack);
+
+//				createTree(output, root, 2);
+				while (loopThis) {
+					cout << "Would you like to print \"prefix\", \"postfix\", or enter the \"next\" string?" << endl << "Input: ";
+					cin.get(input, 100);
+					cin.ignore();
+					if (input[1] == 'r' || input[1] == 'R') {
+						cout << "Prefix notation" << endl;
+						//TODO Write prefix
+					}
+					else if (input[1] == 'o' || input[1] == 'O') {
+						cout << "Postfix notation" << endl;
+						//TODO Write postfix
+					}
+					else if (input[0] == 'n' || input[0] == 'N') {
+						loopThis = false;
+					}
+					else {
+						cout << "Invalid input, please try again." << endl;
+					}
+				}
 			}
 		}
 	}
@@ -147,4 +195,35 @@ Node* peek(Node* & bottom) {
 		}
 		else
 			return NULL;
+}
+
+void createTree (BinaryNode* & root, Node* & tempStack) {
+	BinaryNode* current = root;
+	while (peek(tempStack) != NULL) {
+		if (root == NULL) {
+			root = new BinaryNode(pop(tempStack)->getData(), NULL);
+		}
+		else {
+			while (current->getLeft() != NULL && current->getRight() != NULL) {
+				current = current->getParent();
+			}
+			if (current->getLeft() == NULL) {
+				if (peek(tempStack)->getData()[0] - '0' >= 0 && peek(tempStack)->getData()[0] - '0' <= 9)
+					current->setLeft(new BinaryNode(pop(tempStack)->getData(), current));
+				else {
+					current->setLeft(new BinaryNode(pop(tempStack)->getData(), current));
+					current = current->getLeft();
+				}
+			}
+			else if (current->getRight() == NULL) {
+				if (peek(tempStack)->getData()[0] - '0' >= 0 && peek(tempStack)->getData()[0] - '0' <= 9)
+					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
+				else {
+					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
+					current = current->getRight();
+				}
+			}
+		}
+
+	}
 }

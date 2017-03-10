@@ -11,7 +11,7 @@
 using namespace std;
 
 //Constructs a Node
-Node::Node(char newData) {
+Node::Node(char* newData) {
   data = newData;
   next = NULL;
 }
@@ -20,7 +20,7 @@ Node* Node::getNext() {
   return next;
 }
 //Return data
-char Node::getData() {
+char* Node::getData() {
   return data;
 }
 //Sets next Node
@@ -30,6 +30,7 @@ void Node::setNext(Node* newNext) {
 //Destructs the Node
 Node::~Node() {
   next = NULL;
+  delete[] data;
 }
 
 
