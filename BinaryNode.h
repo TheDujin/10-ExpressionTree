@@ -10,36 +10,46 @@
 
 #include <iostream>
 using namespace std;
-//TODO Edit the comment below
-/** -- Class Node --
-  * The Node object is a component that, in conjunction with other nodes,
-  * can form singly-linked lists.
-  * The Node can be used to store and access chars.
+/** -- Class BinaryNode --
+  * The BinaryNode object is a component that, in conjunction with other binary nodes,
+  * can form binary trees.
+  * The BinaryNode can be used to store and access char pointers.
   *
   * Members:
-  * private char data
-  * - The char value that the Node holds.
-  *    The data of a Node cannot be changed after construction.
-  * private Node* next
-  * - The Node pointer that represents what the next Node in the list is.
+  * private char* data
+  * - The char* value that the Node holds.
+  *    The data of a BinaryNode cannot be changed after construction.
+  * private BinaryNode* left
+  * - The BinaryNode pointer that represents the left child in the tree.
+  * private BinaryNode* right
+  * - The BinaryNode pointer that represents the right child in the tree.
+  * private BinaryNode* parent
+  * - The BinaryNode pointer that represents the parent of this BinaryNode (root's parent should be null).
   *
   * Methods:
-  * Node(char newData)
-  * - Constructs a new Node object
-  *    Parameters: newData - the char value that the member data is set to.
-  * Node* getNext()
-  * - Returns the Node pointer that is the next Node in the singly-linked list;
-  *    returns the value in the member next.
-  * char getData();
-  * - Returns the char value that this Node contains;
+  * BinaryNode(char* newData, BinaryNode* parent)
+  * - Constructs a new BinaryNode object
+  *    Parameters: newData - the char* value that the member data is set to.
+  * BinaryNode* getLeft()
+  * - Returns the BinaryNode pointer that is the left child of this BinaryNode;
+  *    returns the value in the member left.
+  * BinaryNode* getRight()
+  * - Returns the BinaryNode pointer that is the right child of this BinaryNode;
+  *    returns the value in the member right.
+  * BinaryNode* getParent()
+  * - Returns the BinaryNode pointer that is the parent of this BinaryNode;
+  *    returns the value in the member parent.
+  * char* getData();
+  * - Returns the char* value that this BinaryNode contains;
   *    returns the value in the member data.
-  * void setNext(Node* newNext)
-  * - Sets the value for the member next.
-  *    Parameters: newNext - the Node pointer that the member next is set to.
-  * ~Node()
-  * - Destructs the Node.
-  *    WARNING: The user must use calls to setNext to fix any gaps in the list
-  *    caused by deleting the Node.
+  * void setLeft(BinaryNode* newLeft)
+  * - Sets the value for the member left.
+  *    Parameters: newLeft - the BinaryNode pointer that the member left is set to.
+  * void setRight(BinaryNode* newRight)
+  * - Sets the value for the member right.
+  *    Parameters: newRight - the BinaryNode pointer that the member right is set to.
+  * ~BinaryNode()
+  * - Destructs the BinaryNode.
   *
   **/
 class BinaryNode {

@@ -17,6 +17,8 @@ void push(Node* newNode, Node* & bottom);
 Node* pop(Node* & bottom);
 Node* peek(Node* & bottom);
 void createTree (BinaryNode* & root, Node* & tempStack);
+void readPrefix (BinaryNode* root);
+void readPostfix (BinaryNode* root);
 
 //Main method. Prompts for the infix expression, then converts it.
 int main() {
@@ -103,6 +105,11 @@ int main() {
 				}
 
 			}
+			//Checks if input is empty. That's bad
+			if (strlen(output) == 0 && !invalid) {
+				cout << "Empty input, try again" << endl;
+				invalid = true;
+			}
 			//If the expression is not invalid, pop the operator stack onto output then print output.
 			if (!invalid) {
 				while (peek(head) != NULL) {
@@ -110,12 +117,15 @@ int main() {
 					output[counter] = pop(head)->getData()[0];
 					counter++;
 				}
+				//Show them the postfix expression
 				cout << "The postfix expression created from your input: " << output << endl;
 				bool loopThis = true;
+				//Build tree:
 				BinaryNode* root = NULL;
 				Node* tempStack = NULL;
 				char* temp = new char[80];
 				int counter = 0;
+				//First, create a temporary stack where we pushed the tokens in order (so when we pop it, it's backwards)
 				for (int i = 0; i < strlen(output); i++) {
 					if (output[i] != ' ') {
 						temp[counter] = output[i];
@@ -128,23 +138,29 @@ int main() {
 						temp = new char[80];
 					}
 				}
-				createTree(root, tempStack);
+				//Push the last token since the array ended before we could push
 				temp[counter] = '\0';
 				push(new Node(temp), tempStack);
-
-//				createTree(output, root, 2);
+				//Create the tree given the initially null root and the stack we created
+				createTree(root, tempStack);
 				while (loopThis) {
+					//Prompt for prefix, postfix, or ask if they want to enter a new infix expression
 					cout << "Would you like to print \"prefix\", \"postfix\", or enter the \"next\" string?" << endl << "Input: ";
 					cin.get(input, 100);
 					cin.ignore();
+					//If the second letter in their input is 'r' (i.e. they probably entered "pRefix"), print prefix
 					if (input[1] == 'r' || input[1] == 'R') {
-						cout << "Prefix notation" << endl;
-						//TODO Write prefix
+						cout << "Prefix notation: " << endl;
+						readPrefix(root);
+						cout << endl;
 					}
+					//Else if the second letter in their input is 'o' (i.e. they probably entered "pOstfix"), print postfix
 					else if (input[1] == 'o' || input[1] == 'O') {
-						cout << "Postfix notation" << endl;
-						//TODO Write postfix
+						cout << "Postfix notation: " << endl;
+						readPostfix(root);
+						cout << endl;
 					}
+					//Else if the first letter is 'n' (i.e. they probably entered "Next"), end this loop
 					else if (input[0] == 'n' || input[0] == 'N') {
 						loopThis = false;
 					}
@@ -196,18 +212,34 @@ Node* peek(Node* & bottom) {
 		else
 			return NULL;
 }
-
+//Creates an expression tree given an initially empty root and a stack of tokens
 void createTree (BinaryNode* & root, Node* & tempStack) {
-	BinaryNode* current = root;
+	//Initialize a current pointer which points to where we are in the tree at a given time
+	BinaryNode* current;
+	//If the root is null, the tree is empty. So, we set root to the first token
 	while (peek(tempStack) != NULL) {
 		if (root == NULL) {
 			root = new BinaryNode(pop(tempStack)->getData(), NULL);
+			current = root;
 		}
+		//Otherwise, move up the tree until we have an open left/right child (we might not have to move at all)
 		else {
 			while (current->getLeft() != NULL && current->getRight() != NULL) {
 				current = current->getParent();
 			}
-			if (current->getLeft() == NULL) {
+			//We preferentially fill the right half of a tree
+			if (current->getRight() == NULL) {
+				//If the stack contains a number token, fill the right child with it
+				if (peek(tempStack)->getData()[0] - '0' >= 0 && peek(tempStack)->getData()[0] - '0' <= 9)
+					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
+				else {
+					//If the stack contains an operator token, fill the right child and then move to it (and build our tree from there)
+					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
+					current = current->getRight();
+				}
+			}
+			//We fill the left half if the right half is already full. Otherwise, it's same as right child
+			else if (current->getLeft() == NULL) {
 				if (peek(tempStack)->getData()[0] - '0' >= 0 && peek(tempStack)->getData()[0] - '0' <= 9)
 					current->setLeft(new BinaryNode(pop(tempStack)->getData(), current));
 				else {
@@ -215,15 +247,23 @@ void createTree (BinaryNode* & root, Node* & tempStack) {
 					current = current->getLeft();
 				}
 			}
-			else if (current->getRight() == NULL) {
-				if (peek(tempStack)->getData()[0] - '0' >= 0 && peek(tempStack)->getData()[0] - '0' <= 9)
-					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
-				else {
-					current->setRight(new BinaryNode(pop(tempStack)->getData(), current));
-					current = current->getRight();
-				}
-			}
 		}
 
 	}
+}
+//Reads the expression tree in a prefix way: Print the node itself, then (recursively) its left child, then (recursively) its right child
+void readPrefix (BinaryNode* root) {
+	cout << root->getData() << " ";
+	if (root->getLeft() != NULL)
+		readPrefix(root->getLeft());
+	if (root->getRight() != NULL)
+		readPrefix(root->getRight());
+}
+//Reads the expression tree in a postfix way: (Recursively) print its left child, then (recursively) its right child, then the node itself
+void readPostfix (BinaryNode* root) {
+	if (root->getLeft() != NULL)
+		readPostfix(root->getLeft());
+	if (root->getRight() != NULL)
+		readPostfix(root->getRight());
+	cout << root->getData() << " ";
 }

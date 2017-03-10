@@ -32,15 +32,15 @@ BinaryNode* BinaryNode::getParent() {
 char* BinaryNode::getData() {
   return data;
 }
-//Sets left Node
+//Sets left BinaryNode
 void BinaryNode::setLeft(BinaryNode* newLeft) {
   left = newLeft;
 }
-//Sets right Node
+//Sets right BinaryNode
 void BinaryNode::setRight(BinaryNode* newRight) {
   right = newRight;
 }
-//Destructs the Node
+//Destructs the BinaryNode
 BinaryNode::~BinaryNode() {
   delete[] data;
 }
